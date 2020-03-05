@@ -35,38 +35,21 @@ def click(ImageName, ImagePicture):
         print('Nothing Located')
        
  
-def BlueCoin():
-    return click('BlueCoin', 'BlueCoin.PNG')
-
-def GreenCoin():
-    return click('GreenCoin', 'GreenCoin.PNG')
-
-def RedUpgrade():
-    return click('RedUpgrade', 'RedUpgrade.PNG')
-
-def BlueUpgrade():
-    return click('BlueUpgrade', 'BlueUpgrade.PNG')
-
-def OrangeUpgrade():
-    return click('OrangeUpgrade', 'OrangeUpgrade.PNG')
-
-def GreenUpgrade():
-    return click('GreenUpgrade', 'GreenUpgrade.PNG')
+def Coins_Upgrades():
+    click('BlueCoin', 'BlueCoin.PNG')
+    click('GreenCoin', 'GreenCoin.PNG')
+    click('RedUpgrade', 'RedUpgrade.PNG')
+    click('BlueUpgrade', 'BlueUpgrade.PNG')
+    click('OrangeUpgrade', 'OrangeUpgrade.PNG')
+    click('GreenUpgrade', 'GreenUpgrade.PNG')
+    click('PurpleUpgrade', 'PurpleUpgrade.PNG')
+    click('PinkUpgrade', 'PinkUpgrade.PNG')
+    click('SelectButton', 'SelectButton.PNG')
+    click('CloseButton', 'CloseButton.PNG')
 
 for i in range(1000):
 
-    BlueCoin()
-
-    GreenCoin() 
-
-    RedUpgrade()
-
-    BlueUpgrade()
-
-    OrangeUpgrade()
-
-    GreenUpgrade()
-
+    Coins_Upgrades()
 
 
 
