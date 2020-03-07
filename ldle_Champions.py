@@ -40,6 +40,7 @@ def Coins_Upgrades():
     click('GreenCoin', 'GreenCoin.PNG')
     click('RedUpgrade', 'RedUpgrade.PNG')
     click('BlueUpgrade', 'BlueUpgrade.PNG')
+    click('BlueUpgradeV2', 'BlueUpgradeV2.PNG')
     click('OrangeUpgrade', 'OrangeUpgrade.PNG')
     click('GreenUpgrade', 'GreenUpgrade.PNG')
     click('PurpleUpgrade', 'PurpleUpgrade.PNG')
