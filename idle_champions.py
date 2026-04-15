@@ -23,7 +23,6 @@ import argparse
 import datetime
 import json
 import logging
-import sys
 import threading
 import time
 from collections import defaultdict
@@ -34,6 +33,12 @@ import pyautogui
 # ---------------------------------------------------------------------------
 # Optional dependencies (degrade gracefully if missing)
 # ---------------------------------------------------------------------------
+
+try:
+    import cv2  # noqa: F401  (pyautogui uses opencv internally for confidence)
+    HAS_OPENCV = True
+except ImportError:
+    HAS_OPENCV = False
 
 try:
     import pygetwindow as gw
@@ -229,7 +234,7 @@ class Notifier:
 # ---------------------------------------------------------------------------
 
 class WindowDetector:
-    WINDOW_TITLES = ["Idle Champions", "idle champions"]
+    WINDOW_TITLE_KEYWORD = "idle champions"
 
     def __init__(self):
         self.region = None  # (left, top, width, height) or None for full screen
@@ -238,13 +243,12 @@ class WindowDetector:
         if not HAS_GETWINDOW:
             return None
         try:
-            for title in self.WINDOW_TITLES:
-                windows = gw.getWindowsWithTitle(title)
-                if windows:
-                    w = windows[0]
-                    if w.width > 0 and w.height > 0:
-                        self.region = (w.left, w.top, w.width, w.height)
-                        return self.region
+            for w in gw.getAllWindows():
+                if (w.title
+                        and self.WINDOW_TITLE_KEYWORD in w.title.lower()
+                        and w.width > 0 and w.height > 0):
+                    self.region = (w.left, w.top, w.width, w.height)
+                    return self.region
         except Exception:
             pass
         return None
@@ -386,6 +390,12 @@ class IdleChampionsBot:
         self._resolve_image_paths()
         pyautogui.FAILSAFE = config.failsafe
 
+        if not HAS_OPENCV:
+            self.log.warning(
+                "opencv-python not installed — confidence matching disabled. "
+                "Install with: pip install opencv-python"
+            )
+
     def _setup_logging(self):
         self.log = logging.getLogger("IdleChampions")
         self.log.setLevel(logging.INFO)
@@ -418,6 +428,7 @@ class IdleChampionsBot:
             Path("."),                      # legacy flat layout
         ]
         res_dir = next((p for p in candidates if p.exists()), base)
+        self.log.info("Image directory: %s", res_dir)
 
         self.image_categories = {
             category: [
@@ -428,14 +439,15 @@ class IdleChampionsBot:
 
     def find_and_click(self, name, image_file):
         """Locate image on screen and click it. Returns True if found."""
-        region = self.window.region
+        kwargs = {
+            "grayscale": self.config.use_grayscale,
+            "region": self.window.region,
+        }
+        if HAS_OPENCV:
+            kwargs["confidence"] = self.config.confidence
+
         try:
-            location = pyautogui.locateOnScreen(
-                image_file,
-                confidence=self.config.confidence,
-                grayscale=self.config.use_grayscale,
-                region=region,
-            )
+            location = pyautogui.locateOnScreen(image_file, **kwargs)
         except pyautogui.ImageNotFoundException:
             return False
         except FileNotFoundError:
@@ -463,14 +475,13 @@ class IdleChampionsBot:
         return True
 
     def click_with_retry(self, name, image_file):
-        """Click an image, retrying to handle multi-click upgrades."""
+        """Click an image, re-clicking until it's gone (for repeatable upgrades)."""
         found_once = False
         for _ in range(self.config.max_retries):
-            if self.find_and_click(name, image_file):
-                found_once = True
-                time.sleep(self.config.search_delay)
-                continue
-            break
+            if not self.find_and_click(name, image_file):
+                break
+            found_once = True
+            time.sleep(self.config.search_delay)
         return found_once
 
     def click_category(self, category):
