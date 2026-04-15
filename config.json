@@ -1,0 +1,28 @@
+{
+  "confidence": 0.7,
+  "use_grayscale": true,
+  "click_hold_time": 0.3,
+  "cycle_delay": 2.0,
+  "search_delay": 0.3,
+  "failsafe": false,
+  "resolution": "1280x720",
+  "image_dir": "images",
+  "log_dir": "logs",
+  "formation_dir": "formations",
+  "dry_run": false,
+  "max_retries": 3,
+  "stuck_threshold": 10,
+  "schedule_hours": 0,
+  "priority_order": [
+    "complete",
+    "skip",
+    "continue",
+    "coins",
+    "upgrades",
+    "ui"
+  ],
+  "enable_notifications": true,
+  "enable_gui": true,
+  "log_to_file": true,
+  "auto_restart_adventure": true
+}
