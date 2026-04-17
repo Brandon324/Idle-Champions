@@ -140,7 +140,7 @@ class Config:
         path = Path(self._path)
         if path.exists():
             try:
-                with open(path) as f:
+                with open(path, encoding="utf-8") as f:
                     file_data = json.load(f)
                 self._data.update(file_data)
             except (json.JSONDecodeError, OSError) as exc:
@@ -265,14 +265,14 @@ class FormationManager:
 
     def save(self, name, data):
         path = self.formation_dir / f"{name}.json"
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
         return path
 
     def load(self, name):
         path = self.formation_dir / f"{name}.json"
         if path.exists():
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         return None
 
@@ -415,7 +415,9 @@ class IdleChampionsBot:
             file_fmt = logging.Formatter(
                 "%(asctime)s [%(levelname)s] %(message)s"
             )
-            fh = logging.FileHandler(log_dir / f"session_{ts}.log")
+            fh = logging.FileHandler(
+                log_dir / f"session_{ts}.log", encoding="utf-8"
+            )
             fh.setFormatter(file_fmt)
             self.log.addHandler(fh)
 

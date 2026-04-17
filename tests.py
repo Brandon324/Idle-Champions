@@ -130,6 +130,14 @@ class TestFormationManager(unittest.TestCase):
             loaded = fm.load("MyTeam")
             self.assertEqual(loaded, data)
 
+    def test_save_and_load_non_ascii(self):
+        """Formation files must round-trip non-ASCII characters (UTF-8)."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fm = ic.FormationManager(tmp)
+            data = {"name": "Squad — Draco's Team", "note": "café ☕"}
+            fm.save("unicode_team", data)
+            self.assertEqual(fm.load("unicode_team"), data)
+
     def test_load_missing_returns_none(self):
         with tempfile.TemporaryDirectory() as tmp:
             fm = ic.FormationManager(tmp)
